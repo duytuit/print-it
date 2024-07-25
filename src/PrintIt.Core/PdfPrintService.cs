@@ -19,7 +19,7 @@ namespace PrintIt.Core
             _logger = logger;
         }
 
-        public void Print(Stream pdfStream, string printerName, string pageRange = null, int numberOfCopies = 1)
+        public void Print(Stream pdfStream, string printerName, string pageRange = null, int numberOfCopies = 1, int duplex = 1)
         {
             if (pdfStream == null)
                 throw new ArgumentNullException(nameof(pdfStream));
@@ -31,6 +31,7 @@ namespace PrintIt.Core
             using var printDocument = new PrintDocument();
             printDocument.PrinterSettings.PrinterName = printerName;
             printDocument.PrinterSettings.Copies = (short)Math.Clamp(numberOfCopies, 1, short.MaxValue);
+            if (duplex == 1) printDocument.PrinterSettings.Duplex = Duplex.Simplex;
             PrintState state = PrintStateFactory.Create(document, pageRange);
             printDocument.PrintPage += (_, e) => PrintDocumentOnPrintPage(e, state);
             printDocument.Print();
@@ -51,6 +52,6 @@ namespace PrintIt.Core
 
     public interface IPdfPrintService
     {
-        void Print(Stream pdfStream, string printerName, string pageRange = null, int numberOfCopies = 1);
+        void Print(Stream pdfStream, string printerName, string pageRange = null, int numberOfCopies = 1, int duplex = 1);
     }
 }
